@@ -2,7 +2,7 @@
 
 ## 1.1.0 - Maintained fork
 - Preserve attribution to the original neepster/5edndnpc project and Chris Jones.
-- Point installation and update metadata to Heyone77/5edndnpc, using its main-branch archive.
+- Point installation and update metadata to Heyone77/5edndnpc, using a versioned release archive and a stable latest-release manifest.
 - Include the v14 adaptations, Russian localization and optional online token artwork described below.
 
 ## Unreleased - Too Many Tokens artwork

@@ -4,7 +4,7 @@ Generates quick, system-valid dnd5e NPCs from the Actor Directory with class/rac
 
 Maintained fork of [neepster/5edndnpc](https://github.com/neepster/5edndnpc), originally created by Chris Jones. This fork adds Foundry v14 adaptations, English/Russian localization and optional Too Many Tokens artwork.
 
-Install this fork using its [Foundry manifest](https://raw.githubusercontent.com/Heyone77/5edndnpc/main/module.json). The download points to this fork's main-branch archive; no separate GitHub release is required.
+Install this fork using its [Foundry manifest](https://github.com/Heyone77/5edndnpc/releases/latest/download/module.json) in Foundry's Install Module dialog. Each release includes a versioned module archive and a separate manifest for installation and updates.
 
 ## Installation (Linux, manual)
 
@@ -36,7 +36,7 @@ Install this fork using its [Foundry manifest](https://raw.githubusercontent.com
 
 The v14 changes were checked against locally installed Foundry 14.369 and dnd5e 6.0.6 sources. Automated tests cover UI integration boundaries, generated data and 48 deterministic comparisons with the original generator. The user also reported 48 PASS results from the in-memory suite in a running Foundry world. Actual UI rendering, persistence and rolls remain to be verified.
 
-`module.json` deliberately retains `verified: "13"` until the [runtime checklist](docs/foundry-v14-validation.md) has passed. Foundry may therefore display an unverified-v14 warning. Set `verified` to `14` only after that check. Fork version 1.1.0 uses the main-branch archive for downloads; a tagged release can replace that URL when published.
+`module.json` deliberately retains `verified: "13"` until the [runtime checklist](docs/foundry-v14-validation.md) has passed. Foundry may therefore display an unverified-v14 warning. Set `verified` to `14` only after that check. Release manifests point to a versioned archive; the latest-release manifest provides the stable installation and update URL.
 
 Foundry v13 support is retained in code, including older spell preparation schemas, but has not been rerun locally. dnd5e 6.0.6 itself requires Foundry 14.367+; use a v13-compatible dnd5e release for v13 testing.
 
