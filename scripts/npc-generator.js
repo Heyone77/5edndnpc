@@ -2,6 +2,8 @@ import { FIRST_NAMES_BY_RACE } from "./data/first-names.js";
 import { LAST_NAMES_BY_RACE, RACES_WITH_SURNAMES } from "./data/last-names.js";
 import { FIRST_NAME_SYLLABLES, LAST_NAME_SYLLABLES } from "./data/name-syllables.js";
 import { BACKSTORY_TABLE } from "./data/backstories.js";
+import { localizeText, localizeItemName } from "./localization.js";
+import { getNpcTokenImage } from "./token-art.js";
 
 export const RACES = ["Human", "Elf", "Dwarf", "Halfling", "Gnome", "Half-Orc", "Half-Elf", "Tiefling", "Dragonborn"];
 export const CLASSES = ["Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"];
@@ -56,11 +58,12 @@ const GEAR_OPTIONS = [
   "Rope (50 feet)"
 ];
 
-export async function generateRandomNpc({ level = 1, race, role } = {}) {
+export async function generateRandomNpc({ level = 1, race, role, useTokenArt = false } = {}) {
   const levelSafe = Math.max(1, Math.min(20, Number(level) || 1));
   const chosenRace = race ?? pick(RACES);
   const chosenClass = role ?? pick(CLASSES);
-  const alignment = pick(ALIGNMENTS);
+  const alignmentValue = pick(ALIGNMENTS);
+  const alignment = localizeText(`alignments.${alignmentValue}`, alignmentValue);
   const name = pickNameForRace(chosenRace);
 
   const abilities = buildAbilitiesForClass(chosenClass, levelSafe);
@@ -110,17 +113,22 @@ export async function generateRandomNpc({ level = 1, race, role } = {}) {
   }
   const biography = buildBackstory(chosenRace, chosenClass);
   const spellSlots = buildSpellSlots(chosenClass, levelSafe);
+  // dnd5e persists overrides; slot maxima are derived during Actor preparation.
+  for (const slot of Object.values(spellSlots)) {
+    slot.override = slot.max;
+    delete slot.max;
+  }
   const spellcastingAbility = SPELLCASTING_ABILITY[chosenClass] ?? "";
   const languages = buildLanguages(chosenRace);
 
   // Format creature type to show race (e.g., "humanoid (elf)")
   const creatureType = {
     value: "humanoid",
-    subtype: chosenRace.toLowerCase(),
+    subtype: localizeText(`races.${chosenRace}`, chosenRace).toLowerCase(),
     custom: ""
   };
 
-  return {
+  const npc = {
     name,
     type: "npc",
     img: "icons/svg/mystery-man.svg",
@@ -130,7 +138,7 @@ export async function generateRandomNpc({ level = 1, race, role } = {}) {
         alignment,
         race: chosenRace,
         cr: levelSafe,
-        source: { custom: `${chosenClass}` },
+        source: { custom: localizeText(`classes.${chosenClass}`, chosenClass) },
         biography: { value: biography }
       },
       abilities,
@@ -138,7 +146,8 @@ export async function generateRandomNpc({ level = 1, race, role } = {}) {
         ac: { flat: ac, calc: "flat" },
         hp: { value: hp, max: hp, formula: hpFormula },
         prof: profBonus,
-        spellcasting: spellcastingAbility
+        spellcasting: spellcastingAbility,
+        spell: { level: spellcastingAbility ? levelSafe : 0 }
       },
       traits: {
         size: "med",
@@ -151,8 +160,17 @@ export async function generateRandomNpc({ level = 1, race, role } = {}) {
       displayBars: 20,
       bar1: { attribute: "attributes.hp" }
     },
-    items: [...finalArmorItems, ...(finalWeapon ? [finalWeapon] : []), ...(backupWeapon ? [backupWeapon] : []), ...essentialItems, ...casterMagicItems, ...gearItems, ...spells]
+    items: [...finalArmorItems, ...(finalWeapon ? [finalWeapon] : []), ...(backupWeapon ? [backupWeapon] : []), ...essentialItems, ...casterMagicItems, ...gearItems, ...spells].map(prepareItemSource)
   };
+  if (useTokenArt) {
+    const src = await getNpcTokenImage({ race: chosenRace, role: chosenClass });
+    if (src) {
+      npc.img = src;
+      npc.prototypeToken.texture = { src };
+      npc.prototypeToken.randomImg = false;
+    }
+  }
+  return npc;
 }
 
 function buildAbilitiesForClass(cls, level = 1) {
@@ -374,7 +392,7 @@ async function buildEssentialClassItems(chosenClass, abilities, level) {
       img: "icons/skills/melee/strike-sword-stabbed-brown.webp",
       system: {
         description: {
-          value: `<p>Once per turn, you can deal an extra ${sneakDice}d6 damage to one creature you hit with an attack if you have advantage on the attack roll. The attack must use a finesse or a ranged weapon.</p><p>You don't need advantage on the attack roll if another enemy of the target is within 5 feet of it, that enemy isn't incapacitated, and you don't have disadvantage on the attack roll.</p>`
+          value: localizeText("features.sneakAttack.description", `<p>Once per turn, you can deal an extra ${sneakDice}d6 damage to one creature you hit with an attack if you have advantage on the attack roll. The attack must use a finesse or a ranged weapon.</p><p>You don't need advantage on the attack roll if another enemy of the target is within 5 feet of it, that enemy isn't incapacitated, and you don't have disadvantage on the attack roll.</p>`, { dice: sneakDice })
         },
         activation: { type: "special", cost: 0 },
         damage: { parts: [[`${sneakDice}d6`, "piercing"]] },
@@ -405,11 +423,19 @@ function rollHp(hitDice, conMod) {
 }
 
 function buildBackstory(race, cls) {
-  const upbringing = pick(BACKSTORY_TABLE.upbringing);
-  const hook = pick(BACKSTORY_TABLE.hooks);
-  const quirk = pick(BACKSTORY_TABLE.quirks);
-  const goal = pick(BACKSTORY_TABLE.goals);
-  return `<p>${upbringing} ${hook}</p><p>${quirk} ${goal}</p><p>Race: ${race}, Class: ${cls}</p>`;
+  const passage = category => {
+    const table = BACKSTORY_TABLE[category];
+    const text = pick(table);
+    return localizeText(`backstory.${category}.${table.indexOf(text)}`, text);
+  };
+  const upbringing = passage("upbringing");
+  const hook = passage("hooks");
+  const quirk = passage("quirks");
+  const goal = passage("goals");
+  const summary = localizeText("biography.summary", `Race: ${race}, Class: ${cls}`, {
+    race: localizeText(`races.${race}`, race), class: localizeText(`classes.${cls}`, cls)
+  });
+  return `<p>${upbringing} ${hook}</p><p>${quirk} ${goal}</p><p>${summary}</p>`;
 }
 
 function buildLanguages(race) {
@@ -467,9 +493,13 @@ async function buildSpellsForClass(cls, level) {
   // Prepare all spells
   return selectedSpells.map((spell) => {
     const data = spell.toObject();
-    data.system.preparation = data.system.preparation || {};
-    data.system.preparation.mode = "prepared";
-    data.system.preparation.prepared = true;
+    if ("method" in CONFIG.Item.dataModels.spell.schema.fields) {
+      data.system.method = "spell";
+      data.system.prepared = 1;
+      delete data.system.preparation;
+    } else {
+      data.system.preparation = { mode: "prepared", prepared: true };
+    }
     return data;
   });
 }
@@ -532,7 +562,8 @@ function pickFirstName(race) {
   if (Math.random() < 0.3) {
     return generateFirstNameFromSyllables(race);
   }
-  return pick(names);
+  const name = pick(names);
+  return localizeText(`names.first.${race}.${names.indexOf(name)}`, name);
 }
 
 function pickLastName(race) {
@@ -541,7 +572,8 @@ function pickLastName(race) {
   if (Math.random() < 0.3) {
     return generateLastNameFromSyllables(race);
   }
-  return pick(surnames);
+  const name = pick(surnames);
+  return localizeText(`names.last.${race}.${surnames.indexOf(name)}`, name);
 }
 
 function formatModifier(mod) {
@@ -813,8 +845,43 @@ function upgradeItem(item, bonus) {
   const rarity = bonus === 1 ? "uncommon" : bonus === 2 ? "rare" : "veryRare";
   if (!clone.system) clone.system = {};
   clone.system.rarity = clone.system.rarity || rarity;
-  clone.system.magicalBonus = bonus;
+  if (clone.type === "equipment") {
+    clone.system.armor ??= {};
+    clone.system.armor.magicalBonus = bonus;
+  } else {
+    clone.system.magicalBonus = bonus;
+  }
+  const properties = clone.system.properties;
+  clone.system.properties = Array.isArray(properties) ? [...properties]
+    : Object.keys(properties ?? {}).filter(key => properties[key]);
+  if (!clone.system.properties.includes("mgc")) clone.system.properties.push("mgc");
   return clone;
+}
+
+/** Complete Item sources so dnd5e can run its own legacy-to-activity migration.
+ * Fresh IDs also prevent repeated compendium items from colliding within an Actor.
+ * Activity and effect IDs are left intact because they may reference one another.
+ */
+function prepareItemSource(item) {
+  // Compendium translations belong to the source pack. Localize our fallbacks.
+  if (!item._id) item.name = localizeItemName(item.name);
+  item._id = foundry.utils.randomID();
+  item.effects ??= [];
+  const system = item.system;
+  // Activity initialization runs before legacy object properties are cleaned.
+  if (system?.properties && !Array.isArray(system.properties)) {
+    system.properties = Object.keys(system.properties).filter(key => system.properties[key]);
+  }
+  if (typeof system?.attunement === "number") {
+    if (system.attunement === 2) system.attuned = true;
+    system.attunement = system.attunement ? "required" : "";
+  }
+  // Custom magical weapons bypass upgradeItem, but still need the magic property.
+  if (item.type === "weapon" && system?.magicalBonus) {
+    system.properties ??= [];
+    if (!system.properties.includes("mgc")) system.properties.push("mgc");
+  }
+  return item;
 }
 
 async function buildCasterMagicItems(chosenClass, level) {
@@ -849,7 +916,7 @@ async function buildCasterMagicItems(chosenClass, level) {
     // Clone and upgrade the compendium item
     const upgraded = upgradeItem(weaponItem, bonus);
     // Use display name for consistency
-    upgraded.name = `${weaponChoice.displayName} +${bonus}`;
+    upgraded.name = `${localizeItemName(weaponChoice.displayName)} +${bonus}`;
     items.push(upgraded);
   } else {
     // Fallback: create custom item
@@ -891,7 +958,7 @@ async function buildCasterMagicItems(chosenClass, level) {
     if (armorItem) {
       // Clone and upgrade the compendium item
       const upgraded = upgradeItem(armorItem, armorBonus);
-      upgraded.name = `${armorChoice.displayName} +${armorBonus}`;
+      upgraded.name = `${localizeItemName(armorChoice.displayName)} +${armorBonus}`;
       items.push(upgraded);
     } else {
       // Fallback: create custom item
@@ -930,7 +997,7 @@ async function buildCasterMagicItems(chosenClass, level) {
     if (accessoryItem) {
       // Clone and upgrade the compendium item
       const upgraded = upgradeItem(accessoryItem, bonus);
-      upgraded.name = `${accessoryChoice.displayName} +${bonus}`;
+      upgraded.name = `${localizeItemName(accessoryChoice.displayName)} +${bonus}`;
       items.push(upgraded);
     } else {
       // Fallback: create custom item
@@ -955,8 +1022,10 @@ async function buildCasterMagicItems(chosenClass, level) {
 
 function generateFirstNameFromSyllables(race) {
   const buckets = FIRST_NAME_SYLLABLES[race] ?? FIRST_NAME_SYLLABLES.Human;
-  const [start, mid, end] = buckets;
-  const pieces = [pick(start), pick(mid), pick(end)];
+  const pieces = buckets.map((bucket, index) => {
+    const syllable = pick(bucket);
+    return localizeText(`names.syllables.first.${race}.${index}.${bucket.indexOf(syllable)}`, syllable);
+  });
   const name = pieces.join("");
   return name.charAt(0).toUpperCase() + name.slice(1);
 }
@@ -964,8 +1033,10 @@ function generateFirstNameFromSyllables(race) {
 function generateLastNameFromSyllables(race) {
   if (!RACES_WITH_SURNAMES.includes(race)) return null;
   const buckets = LAST_NAME_SYLLABLES[race] ?? LAST_NAME_SYLLABLES.Human;
-  const [start, mid, end] = buckets;
-  const pieces = [pick(start), pick(mid), pick(end)];
+  const pieces = buckets.map((bucket, index) => {
+    const syllable = pick(bucket);
+    return localizeText(`names.syllables.last.${race}.${index}.${bucket.indexOf(syllable)}`, syllable);
+  });
   const name = pieces.join("");
   return name.charAt(0).toUpperCase() + name.slice(1);
 }

@@ -1,13 +1,14 @@
 import { generateRandomNpc, RACES, CLASSES } from "./npc-generator.js";
 
 const MODULE_ID = "5edndnpc";
+const localize = key => game.i18n.localize(`${MODULE_ID}.${key}`);
 
 Hooks.once("init", () => {
   console.log(`${MODULE_ID} | Initializing 5e NPC Generator module`);
 
   // Register settings to remember last level range
   game.settings.register(MODULE_ID, "lastMinLevel", {
-    name: "Last Minimum Level",
+    name: "5edndnpc.settings.lastMinLevel",
     scope: "client",
     config: false,
     type: Number,
@@ -15,11 +16,18 @@ Hooks.once("init", () => {
   });
 
   game.settings.register(MODULE_ID, "lastMaxLevel", {
-    name: "Last Maximum Level",
+    name: "5edndnpc.settings.lastMaxLevel",
     scope: "client",
     config: false,
     type: Number,
     default: 5
+  });
+  game.settings.register(MODULE_ID, "tokenArtEnabled", {
+    name: "5edndnpc.settings.tokenArtEnabled",
+    scope: "client",
+    config: false,
+    type: Boolean,
+    default: true
   });
 });
 
@@ -34,94 +42,110 @@ Hooks.once("ready", () => {
 
 Hooks.on("renderActorDirectory", (app, html) => {
   if (game.system.id !== "dnd5e") return;
-
-  const $html = html instanceof jQuery ? html : $(html);
-
-  // Check if button already exists
-  if ($html.find(`.npc-gen-button[data-module="${MODULE_ID}"]`).length) return;
-
-  // Find or create footer action bar at the bottom
-  let footer = $html.find(".directory-footer");
-  if (!footer.length) {
-    footer = $(`<footer class="directory-footer flexrow"></footer>`);
-    $html.find(".directory-list").after(footer);
+  // ApplicationV2 supplies an HTMLElement; tolerate v13 hooks supplying jQuery.
+  const root = html?.querySelector ? html : html?.[0];
+  if (!root) return;
+  const existing = root.querySelector(`.npc-gen-button[data-module="${MODULE_ID}"]`);
+  if (!CONFIG.Actor.documentClass.canUserCreate(game.user)) {
+    existing?.remove();
+    return;
   }
+  if (existing) return;
 
-  let actionBar = footer.find(".action-buttons");
-  if (!actionBar.length) {
-    actionBar = $(`<div class="action-buttons flexrow"></div>`);
-    footer.append(actionBar);
+  let footer = root.querySelector(".directory-footer");
+  if (!footer) {
+    const list = root.querySelector(".directory-list");
+    if (!list) return;
+    footer = document.createElement("footer");
+    footer.className = "directory-footer action-buttons flexcol npc-gen-footer";
+    list.after(footer);
   }
-
-  const button = $(
-    `<button type="button" class="npc-gen-button" data-module="${MODULE_ID}">
-      <i class="fas fa-user-plus"></i> Generate 5e NPC
-    </button>`
-  );
-
-  button.on("click", () => openNpcDialog());
+  const actionBar = footer.matches(".action-buttons") ? footer : footer.querySelector(".action-buttons") ?? footer;
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "npc-gen-button";
+  button.dataset.module = MODULE_ID;
+  button.innerHTML = `<i class="fas fa-user-plus" inert></i> ${localize("button")}`;
+  button.addEventListener("click", openNpcDialog);
   actionBar.append(button);
   console.debug(`${MODULE_ID} | Added 5e NPC button to Actor Directory footer`);
 });
 
 function openNpcDialog() {
-  const raceOptions = ['<option value="random">Random Race</option>', ...RACES.map((race) => `<option value="${race}">${race}</option>`)].join("");
-  const classOptions = ['<option value="random">Random Class</option>', ...CLASSES.map((cls) => `<option value="${cls}">${cls}</option>`)].join("");
+  if (!CONFIG.Actor.documentClass.canUserCreate(game.user)) return;
+  const raceOptions = [`<option value="random">${localize("dialog.randomRace")}</option>`, ...RACES.map((race) => `<option value="${race}">${localize(`races.${race}`)}</option>`)].join("");
+  const classOptions = [`<option value="random">${localize("dialog.randomClass")}</option>`, ...CLASSES.map((cls) => `<option value="${cls}">${localize(`classes.${cls}`)}</option>`)].join("");
 
   // Load last used level range from settings
   const lastMinLevel = game.settings.get(MODULE_ID, "lastMinLevel") || 1;
   const lastMaxLevel = game.settings.get(MODULE_ID, "lastMaxLevel") || 5;
+  const tokenArtEnabled = game.settings.get(MODULE_ID, "tokenArtEnabled");
 
   const content = `
-    <form class="npc-generator-form">
+    <div class="npc-generator-form">
       <div class="form-group level-range">
-        <label>Level Range</label>
+        <label>${localize("dialog.levelRange")}</label>
         <div class="level-inputs">
-          <input type="number" name="minLevel" value="${lastMinLevel}" min="1" max="20" placeholder="Min">
-          <span class="level-separator">to</span>
-          <input type="number" name="maxLevel" value="${lastMaxLevel}" min="1" max="20" placeholder="Max">
+          <input type="number" name="minLevel" value="${lastMinLevel}" min="1" max="20" placeholder="${localize("dialog.min")}">
+          <span class="level-separator">${localize("dialog.to")}</span>
+          <input type="number" name="maxLevel" value="${lastMaxLevel}" min="1" max="20" placeholder="${localize("dialog.max")}">
         </div>
-        <p class="hint">NPC will be assigned a random level within this range</p>
+        <p class="hint">${localize("dialog.levelHint")}</p>
       </div>
       <div class="form-group">
-        <label>Race</label>
+        <label>${localize("dialog.race")}</label>
         <select name="race">${raceOptions}</select>
       </div>
       <div class="form-group">
-        <label>Class</label>
+        <label>${localize("dialog.class")}</label>
         <select name="role">${classOptions}</select>
       </div>
-    </form>
+      <div class="form-group token-art">
+        <label class="checkbox">
+          <input type="checkbox" name="tokenArt" ${tokenArtEnabled ? "checked" : ""}>
+          ${localize("dialog.tokenArt")}
+        </label>
+        <p class="hint">${localize("dialog.tokenArtHint")}</p>
+      </div>
+    </div>
   `;
 
-  new Dialog({
-    title: "Generate 5e NPC",
+  new foundry.applications.api.DialogV2({
+    window: { title: localize("dialog.title") },
     content,
-    buttons: {
-      generate: {
-        label: "Generate",
-        callback: (html) => handleGenerateNpc(html)
+    buttons: [
+      {
+        action: "generate",
+        label: localize("dialog.generate"),
+        default: true,
+        callback: (_event, button) => handleGenerateNpc(button.form)
       },
-      cancel: {
-        label: "Cancel"
+      {
+        action: "cancel",
+        label: localize("dialog.cancel"),
+        type: "button"
       }
-    },
-    default: "generate"
-  }).render(true);
+    ]
+  }).render({ force: true });
 }
 
-async function handleGenerateNpc(html) {
+async function handleGenerateNpc(form) {
   if (game.system.id !== "dnd5e") {
-    ui.notifications?.warn("5edndnpc: This module only works with the dnd5e system.");
+    ui.notifications?.warn(localize("notifications.wrongSystem"));
+    return;
+  }
+  const ActorClass = CONFIG.Actor.documentClass;
+  if (!ActorClass.canUserCreate(game.user)) {
+    ui.notifications?.warn(localize("notifications.noPermission"));
     return;
   }
 
   try {
-    const $html = html instanceof jQuery ? html : $(html);
+    const fields = form.elements;
 
     // Get level range and randomize
-    const minLevel = Math.max(1, Math.min(20, Number($html.find('input[name="minLevel"]').val()) || 1));
-    const maxLevel = Math.max(1, Math.min(20, Number($html.find('input[name="maxLevel"]').val()) || 5));
+    const minLevel = Math.max(1, Math.min(20, Number(fields.namedItem("minLevel").value) || 1));
+    const maxLevel = Math.max(1, Math.min(20, Number(fields.namedItem("maxLevel").value) || 5));
     const levelRange = [Math.min(minLevel, maxLevel), Math.max(minLevel, maxLevel)];
     const level = levelRange[0] + Math.floor(Math.random() * (levelRange[1] - levelRange[0] + 1));
 
@@ -129,18 +153,25 @@ async function handleGenerateNpc(html) {
     await game.settings.set(MODULE_ID, "lastMinLevel", minLevel);
     await game.settings.set(MODULE_ID, "lastMaxLevel", maxLevel);
 
-    const raceValue = $html.find('select[name="race"]').val();
-    const roleValue = $html.find('select[name="role"]').val();
+    const raceValue = fields.namedItem("race").value;
+    const roleValue = fields.namedItem("role").value;
+    const useTokenArt = fields.namedItem("tokenArt").checked;
+    await game.settings.set(MODULE_ID, "tokenArtEnabled", useTokenArt);
 
     const npcData = await generateRandomNpc({
       level,
       race: raceValue === "random" ? undefined : raceValue,
-      role: roleValue === "random" ? undefined : roleValue
+      role: roleValue === "random" ? undefined : roleValue,
+      useTokenArt
     });
-    const actor = await Actor.create(npcData);
-    ui.notifications?.info(`5edndnpc: Created level ${level} NPC "${actor.name}"`);
+    if (useTokenArt && !npcData.prototypeToken.texture?.src) {
+      ui.notifications?.warn(localize("notifications.tokenArtUnavailable"));
+    }
+    const actor = await ActorClass.create(npcData);
+    if (!actor) return;
+    ui.notifications?.info(game.i18n.format("5edndnpc.notifications.created", { level, name: actor.name }));
   } catch (error) {
     console.error(`${MODULE_ID} | Failed to create NPC`, error);
-    ui.notifications?.error("5edndnpc: Failed to create NPC. Check console for details.");
+    ui.notifications?.error(localize("notifications.failed"));
   }
 }

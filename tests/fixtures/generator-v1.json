@@ -1,0 +1,242 @@
+[
+  {
+    "role": "Barbarian",
+    "level": 1,
+    "sha256": "d27580877595f407217337f90c3d7666a017f12a95dea513c1a29581b8220381"
+  },
+  {
+    "role": "Barbarian",
+    "level": 5,
+    "sha256": "bbad7e79376236e3276c578c854e8911e74fedad0890e5554c8ac48f013b3c2d"
+  },
+  {
+    "role": "Barbarian",
+    "level": 11,
+    "sha256": "1b8f3b3f3c9429017926b999d742615324d06099f2c8c673f026a9a46ad3d32b"
+  },
+  {
+    "role": "Barbarian",
+    "level": 20,
+    "sha256": "c116a57202de6ad28ee46b135d08706e686ae4d0b66f11ab8b52cb15af7cc3ed"
+  },
+  {
+    "role": "Bard",
+    "level": 1,
+    "sha256": "8445fad940b4dfa3369d3c5db285a47ddae0c7827474dc5d4904511d71c09b64"
+  },
+  {
+    "role": "Bard",
+    "level": 5,
+    "sha256": "492bd3421209b5f5126dd127b02172b900c63466b5bd71dd3913f45ecc2a3539"
+  },
+  {
+    "role": "Bard",
+    "level": 11,
+    "sha256": "ac19bf82983f00ae5bd55c188cb278ef63103c9b33e53e587af337e33534a7bb"
+  },
+  {
+    "role": "Bard",
+    "level": 20,
+    "sha256": "bbf201c469799942ecb7838f79be3cfde7d6e2237dd280c8b3971fd1f59f7b04"
+  },
+  {
+    "role": "Cleric",
+    "level": 1,
+    "sha256": "2eec3373a92a2e3c02fc4c46efd45997aa3ce79f0b8f8e0cf79a7bdf91a83466"
+  },
+  {
+    "role": "Cleric",
+    "level": 5,
+    "sha256": "4087442c01f0f428dad85fa7f098e0dee399068a7332286eac9427dbd6d91b4b"
+  },
+  {
+    "role": "Cleric",
+    "level": 11,
+    "sha256": "929ef0c8e1adb4955212cb24815cf42d8a215b0c8c0fd064d989f85708c690ba"
+  },
+  {
+    "role": "Cleric",
+    "level": 20,
+    "sha256": "7a6c449e6a628f64951ea7e81af1f1852a0542ba9d19781a18c70099f3378fa6"
+  },
+  {
+    "role": "Druid",
+    "level": 1,
+    "sha256": "2184c6f1e818b34e381a692c7c3c14c927fead92ea507d39a5f8c218a9f09636"
+  },
+  {
+    "role": "Druid",
+    "level": 5,
+    "sha256": "94f1e2855de4bb754401a73259ed2f4f81f6392cfab0084cf71088c5b770150c"
+  },
+  {
+    "role": "Druid",
+    "level": 11,
+    "sha256": "88ff6c01d1b9ad909acdccd88d8966b94699cfd6b82a36d861c6608794199afa"
+  },
+  {
+    "role": "Druid",
+    "level": 20,
+    "sha256": "008706ec1e8daaddbe231cdb85b5009c0c7492be57804e64a3a0ffa0267dcf6c"
+  },
+  {
+    "role": "Fighter",
+    "level": 1,
+    "sha256": "93d80afdef7201630df6d5a31b592dd622acd0d3d261b27d3591700b2cf8feb0"
+  },
+  {
+    "role": "Fighter",
+    "level": 5,
+    "sha256": "0c44a20d1bdcc4830c9882534e163f528086dc0410a7de995cf0881fb32f6dd4"
+  },
+  {
+    "role": "Fighter",
+    "level": 11,
+    "sha256": "690afa73545b7883cf4a087c00af9337d44c4b7e1f0e255896a21a0063be6a2b"
+  },
+  {
+    "role": "Fighter",
+    "level": 20,
+    "sha256": "ec6c5966fdbde6558084525fd6f234dffe564436505caf772afb583f0d481446"
+  },
+  {
+    "role": "Monk",
+    "level": 1,
+    "sha256": "7bcd1b96707ffa0c15cfb539078413e7a666bdc8b8587e3b253c6e8d37852267"
+  },
+  {
+    "role": "Monk",
+    "level": 5,
+    "sha256": "a98664fc25793e4d8ec57ba1f8a3e31f20294e3e52978e09fd272669782b6f24"
+  },
+  {
+    "role": "Monk",
+    "level": 11,
+    "sha256": "f53f535504456d4b741c86e09315430d07e2cfba086d470d0bca9ad8b531da9c"
+  },
+  {
+    "role": "Monk",
+    "level": 20,
+    "sha256": "facde16904da1b718de8fa9ed3ec677aa251430cf04a79b489adaf805b79a623"
+  },
+  {
+    "role": "Paladin",
+    "level": 1,
+    "sha256": "d25f61140d59c47dc0ceba44ad4399aab322f8fe9dea272ba1a23a0c85e38a71"
+  },
+  {
+    "role": "Paladin",
+    "level": 5,
+    "sha256": "4577e064239beaa32fe0bafc4bc346698a4130f633a43bfc2dd40bd5475053d5"
+  },
+  {
+    "role": "Paladin",
+    "level": 11,
+    "sha256": "21fd3c3ec83bcd7d4c03a19983ebcfb3c1c734c39b2e1679599eeebd20ecee7f"
+  },
+  {
+    "role": "Paladin",
+    "level": 20,
+    "sha256": "90b226b342cecf9fa154d9cf58d6f731e0186be80cf8f248c750b3f646e74284"
+  },
+  {
+    "role": "Ranger",
+    "level": 1,
+    "sha256": "7e9c6252f01e03cff9c790a29ef0bd7e46102445e844c6d490c777d97fa48ffc"
+  },
+  {
+    "role": "Ranger",
+    "level": 5,
+    "sha256": "74f053877627d27d75ef942488e4e5963e969d4bc5f43ba46b76d262a3ac56b4"
+  },
+  {
+    "role": "Ranger",
+    "level": 11,
+    "sha256": "41173b8973eee9721915eb4ed0d6d963caca76fdf4dfa5f8289f8d214a6a03bb"
+  },
+  {
+    "role": "Ranger",
+    "level": 20,
+    "sha256": "1971f8558acda820699cea4db9e225fb4ed1fa4574dbcbc6096bdab704b14fc6"
+  },
+  {
+    "role": "Rogue",
+    "level": 1,
+    "sha256": "71d605b82f5b270b22bfe8e37025e5d7844da0cfbe6a54578f05daafec9b5788"
+  },
+  {
+    "role": "Rogue",
+    "level": 5,
+    "sha256": "b02c34c48c514d5c94ad2771687973f6fbc8a32d09c02a8c1a38fc271efa7fc3"
+  },
+  {
+    "role": "Rogue",
+    "level": 11,
+    "sha256": "dc23bffdcdd1f882488c3abe83f9734eebd5a5de67b314c6efc0507600c9f72a"
+  },
+  {
+    "role": "Rogue",
+    "level": 20,
+    "sha256": "8cc67267497ad683a3adf2fd65d2ea5b1fcb1ecdc5d6577f9fcb8600dc4025e3"
+  },
+  {
+    "role": "Sorcerer",
+    "level": 1,
+    "sha256": "a5dc75700b879f9bf02a85bfdda45ad718c831d163570d06da65ce7720d546aa"
+  },
+  {
+    "role": "Sorcerer",
+    "level": 5,
+    "sha256": "42e8bf8e98e6b67c5d2fef59c7b1ccc8ecb89431c6202479f0b9e909f0a48ddf"
+  },
+  {
+    "role": "Sorcerer",
+    "level": 11,
+    "sha256": "9885d1c46ca7e8c30a548f040b8a221e72d6d90a796774565da4852b1f135f4a"
+  },
+  {
+    "role": "Sorcerer",
+    "level": 20,
+    "sha256": "d52236c4a272ea38cbf2c1b24655e11de7773ce2e7cb190ae23d7e4b1f7069b0"
+  },
+  {
+    "role": "Warlock",
+    "level": 1,
+    "sha256": "fc7c767bc11412fabe536a9bb23fca715a301a0ad2626d05b5fe73b31a438641"
+  },
+  {
+    "role": "Warlock",
+    "level": 5,
+    "sha256": "1d894aa73931c24584b1d0f24da002393155e2c07e0060d008726229a191dae4"
+  },
+  {
+    "role": "Warlock",
+    "level": 11,
+    "sha256": "3573b34d2a69a7d685cb6ccbe71bee2fc7cb5c2c830f4aacbf0ac6c7093b7fd4"
+  },
+  {
+    "role": "Warlock",
+    "level": 20,
+    "sha256": "bf9cded1e31b8b6b6c6c7d1c825c099854905f9ef23a45879ebcaccc150a96f0"
+  },
+  {
+    "role": "Wizard",
+    "level": 1,
+    "sha256": "58055a68fd6cfad5ecf7d4394456773b1ac2673c15dd91a451bf122e502dc2cb"
+  },
+  {
+    "role": "Wizard",
+    "level": 5,
+    "sha256": "f446604786b7abfaf76f73936d5cc34a237d11059a42c527f7d241debb3e971e"
+  },
+  {
+    "role": "Wizard",
+    "level": 11,
+    "sha256": "8222b58e359ec9b9f487eab7f0e12f0a6381116ec89795971b2abdaa8f70a39c"
+  },
+  {
+    "role": "Wizard",
+    "level": 20,
+    "sha256": "6bc7698b23024301677e8504b4dcf4a722cd5c9a969ef5949326d305925edd93"
+  }
+]

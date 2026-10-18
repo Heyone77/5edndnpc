@@ -1,15 +1,7 @@
 /* 5e D&D NPC Generator Module Styles */
 
-.directory-footer {
+.npc-gen-footer {
   padding: 0.5rem;
-  border-top: 1px solid var(--color-border-light-tertiary);
-  background: var(--color-bg-btn);
-}
-
-.directory-footer .action-buttons {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
 }
 
 .npc-gen-button {
@@ -34,7 +26,7 @@
   margin-bottom: 0.25rem;
 }
 
-.npc-generator-form input,
+.npc-generator-form input:not([type="checkbox"]),
 .npc-generator-form select {
   width: 100%;
   padding: 0.25rem;
@@ -52,7 +44,7 @@
 }
 
 .npc-generator-form .level-separator {
-  color: var(--color-text-dark-secondary);
+  color: var(--color-text-secondary, inherit);
   font-weight: bold;
 }
 
@@ -60,5 +52,15 @@
   margin: 0.25rem 0 0 0;
   font-size: 0.85em;
   font-style: italic;
-  color: var(--color-text-dark-secondary);
+  color: var(--color-text-secondary, inherit);
+}
+
+.npc-generator-form .token-art .checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.npc-generator-form .token-art input[type="checkbox"] {
+  flex: 0 0 auto;
 }

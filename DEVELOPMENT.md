@@ -24,6 +24,16 @@ rsync -av --delete ./ "$MODULE_PATH"/
 
 ## Running checks
 
+Run the dependency-free regression tests with a current Node.js version (tested with 24.13.0):
+
+```bash
+node --test tests/*.test.mjs
+```
+
+The fixtures in `tests/fixtures/generator-v1.json` record SHA-256 fingerprints of the original generator for all 12 classes at levels 1, 5, 11 and 20, using Human and a fixed random seed. They guard names, biographies, characteristics, HP/AC, slot counts, equipment choices and legacy damage formulas. Schema adaptations and document IDs are tested separately.
+
+`tests/main.test.mjs` uses browser/Foundry boundary stand-ins. It does not exercise real rendering or database persistence. For runtime checks, follow [Foundry v14 validation](docs/foundry-v14-validation.md), including the optional in-memory smoke suite.
+
 There is no build step. For quick syntax sanity:
 
 ```bash
